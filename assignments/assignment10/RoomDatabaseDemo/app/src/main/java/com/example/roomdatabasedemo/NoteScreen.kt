@@ -5,6 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -31,6 +34,36 @@ fun NoteScreen(viewModel: NoteViewModel) {
     // Coroutine scope for launching suspending functions, like showing snackbars.
     val scope = rememberCoroutineScope()
 
+    val DarkColors = darkColorScheme(
+        primary = (Color(0xFFBB86FC)),
+        onPrimary = Black,
+        primaryContainer = (Color(0xFF3700B3)),
+        onPrimaryContainer = White,
+        secondary = (Color(0xFF03DAC6)),
+        onSecondary = Black,
+        background = (Color(0xFF121212)),
+        onBackground = White,
+        surface = (Color(0xFF1E1E1E)),
+        onSurface = White,
+        error = (Color(0xFFCF6679)),
+        onError = Black,
+    )
+
+    val LightColors = lightColorScheme(
+        primary = (Color(0xFF6200EE)),
+        onPrimary = White,
+        primaryContainer = (Color(0xFFBB86FC)),
+        onPrimaryContainer = Black,
+        secondary = (Color(0xFF03DAC6)),
+        onSecondary = Black,
+        background = (Color(0xFFF0F0F0)),
+        onBackground = Black,
+        surface = White,
+        onSurface = Black,
+        error = (Color(0xFFB00020)),
+        onError = White
+    )
+
     // Scaffold provides a basic screen layout with a SnackBarHost.
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -49,7 +82,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             // Outlined text field for note content input.
             OutlinedTextField(
                 value = content,
@@ -57,7 +90,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
                 label = { Text("Content") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             // Row for action buttons (Add/Update Note, Cancel Edit).
             Row {
                 // Button to add a new note or update an existing one.
@@ -80,7 +113,8 @@ fun NoteScreen(viewModel: NoteViewModel) {
                     }
                 }) {
                     // Button text changes based on whether a note is being edited.
-                    Text(if (editingNote == null) "Add Note" else "Update Note")
+                    Text(if (editingNote == null) "Add Note" else "Update Note",
+                        color = MaterialTheme.colorScheme.onSurface)
                 }
                 // Show "Cancel Edit" button only when a note is being edited.
                 if (editingNote != null) {
@@ -97,7 +131,7 @@ fun NoteScreen(viewModel: NoteViewModel) {
             }
             Spacer(modifier = Modifier.height(16.dp))
             // Title for the list of notes.
-            Text("Your Notes", style = MaterialTheme.typography.titleMedium)
+            Text("Your Notes", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
             Spacer(modifier = Modifier.height(8.dp))
             // LazyColumn to efficiently display a scrollable list of notes.
             LazyColumn(modifier = Modifier.fillMaxHeight()) {
@@ -119,9 +153,12 @@ fun NoteScreen(viewModel: NoteViewModel) {
                         ) {
                             // Column for displaying note title, content, and date.
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(note.title, style = MaterialTheme.typography.titleSmall)
-                                Text(note.content, style = MaterialTheme.typography.bodyMedium)
-                                Text(note.date, style = MaterialTheme.typography.bodySmall)
+                                Text(note.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(note.content, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(note.date, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                             // Column for Edit and Delete buttons.
                             Column {
@@ -131,12 +168,12 @@ fun NoteScreen(viewModel: NoteViewModel) {
                                     title = note.title
                                     content = note.content
                                 }) {
-                                    Text("Edit")
+                                    Text("Edit", color = MaterialTheme.colorScheme.onSurface)
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
                                 // Button to show delete confirmation dialog.
                                 Button(onClick = { showDeleteDialog = note }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) {
-                                    Text("Delete")
+                                    Text("Delete", color = MaterialTheme.colorScheme.error)
                                 }
                             }
                         }

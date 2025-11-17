@@ -26,9 +26,9 @@ abstract class NoteDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 // Create database here if INSTANCE is null.
                 val instance = Room.databaseBuilder(
-                    context.applicationContext, // Application context to prevent memory leaks.
+                    "notes_db",
+                    context.applicationContext,
                     NoteDatabase::class.java
-                    "notes_db", // The name of the database file.
                 ).build()
                 INSTANCE = instance
                 instance
@@ -36,3 +36,4 @@ abstract class NoteDatabase : RoomDatabase() {
         }
     }
 }
+
