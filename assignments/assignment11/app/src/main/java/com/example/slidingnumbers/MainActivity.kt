@@ -3,7 +3,6 @@ package com.example.slidingnumbers
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateOffsetAsState
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,7 +43,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,10 +68,36 @@ class MainActivity : ComponentActivity() {
 fun SlidingNumbersApp() {
     var moves by remember { mutableStateOf(0) }
     var playing by remember { mutableStateOf(false) }
-    var tiles by remember { mutableStateOf(listOf(1, 2, 3, 0)) }
+    var tiles by remember { mutableStateOf((1..8).toList().plus(0)) }
     var draggedIndex by remember { mutableStateOf<Int?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
-    val gridSize = 2
+    val gridSize = 3
+    var showWinDialog by remember { mutableStateOf(false) }
+
+    if (showWinDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showWinDialog = false
+                playing = true
+                moves = 0
+                tiles = (1..8).toList().plus(0).shuffled()
+            },
+            title = { Text("Puzzle Solved!") },
+            text = { Text("You solved it in $moves moves.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showWinDialog = false
+                        playing = true
+                        moves = 0
+                        tiles = (1..8).toList().plus(0).shuffled()
+                    }
+                ) {
+                    Text("Play Again")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -97,7 +121,7 @@ fun SlidingNumbersApp() {
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.Center
             ) {
                 Box(
                     modifier = Modifier
@@ -131,7 +155,11 @@ fun SlidingNumbersApp() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { playing = true },
+                    onClick = {
+                        playing = true
+                        moves = 0
+                        tiles = (1..8).toList().plus(0).shuffled()
+                    },
                     modifier = Modifier.fillMaxWidth(0.6f),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -150,7 +178,7 @@ fun SlidingNumbersApp() {
             ) {
                 repeat(gridSize) { row ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         repeat(gridSize) { col ->
                             val index = row * gridSize + col
@@ -203,14 +231,15 @@ fun SlidingNumbersApp() {
                                             elevation = if (isDragging) 8.dp else 4.dp,
                                             shape = RoundedCornerShape(12.dp)
                                         )
-                                        // The pointerInput modifier remains here
                                         .pointerInput(index) {
                                             detectDragGestures(
                                                 onDragStart = {
+                                                    if (!playing) return@detectDragGestures
                                                     draggedIndex = index
                                                     dragOffset = Offset.Zero
                                                 },
                                                 onDragEnd = {
+                                                    if (!playing) return@detectDragGestures
                                                     val emptyIndex = tiles.indexOf(0)
 
                                                     if (isAdjacent(index, emptyIndex, gridSize)) {
@@ -218,13 +247,20 @@ fun SlidingNumbersApp() {
                                                         newTiles[emptyIndex] = tiles[index]
                                                         newTiles[index] = 0
                                                         tiles = newTiles
+                                                        moves++
+
+                                                        if (tiles == (1..8).toList() + 0) {
+                                                            playing = false
+                                                            showWinDialog = true
+                                                        }
                                                     }
 
                                                     draggedIndex = null
                                                     dragOffset = Offset.Zero
                                                 },
-                                                onDrag = { change, dragAmount ->
-                                                    dragOffset += Offset(dragAmount.x, dragAmount.y)
+                                                onDrag = { _, dragAmount ->
+                                                    if (!playing) return@detectDragGestures
+                                                    dragOffset += dragAmount
                                                 }
                                             )
                                         },
