@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,13 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.financetracker.data.FinanceDatabase
 import com.example.financetracker.data.Transaction
+import com.example.financetracker.repository.FinanceRepository
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.viewmodel.FinanceViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +48,6 @@ fun TransActionListScreenApp(
     onNavigateBack: () -> Unit = {},
     onNavigateToAddEditTransaction: () -> Unit = {}
 ) {
-    val transactions by viewModel.allTransactions.collectAsState(initial = emptyList())
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,11 +62,10 @@ fun TransActionListScreenApp(
                         )
                     }
                 },
-
                 actions = {
                     IconButton(onClick = onNavigateToAddEditTransaction) {
                         Icon(
-                            imageVector = Icons.Filled.Add,
+                            imageVector = Icons.Default.Add,
                             contentDescription = "Add Transaction"
                         )
                     }
@@ -84,76 +81,21 @@ fun TransActionListScreenApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp)
         ) {
-//            if (transactions.isEmpty()) {
-//                Row(
-//                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-//                    horizontalArrangement = Arrangement.Center
-//                ) {
-//                    Text("No transactions yet. Tap the '+' to add one!")
-//                }
-//            } else {
-//                LazyColumn(
-//                    // Add padding at the top and bottom of the list itself
-//                    modifier = Modifier.padding(vertical = 8.dp),
-//                    verticalArrangement = Arrangement.spacedBy(8.dp)
-//                ) {
-//                    items(transactions) { transaction ->
-//                        TransactionItem(transaction = transaction)
-//                    }
-//                }
-//            }
+            Text("You have no transactions hit the + to add one")
         }
     }
 }
 
-//@Composable
-//fun TransactionItem(transaction: Transaction) {
-//    val formattedDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(transaction.date)
-//    val amountColor = if ("Income") Color(0xFF008000) else Color.Red
-//    val sign = if ("Income") "+" else "-"
-//
-//    Card(
-//        modifier = Modifier.fillMaxWidth(),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Column(modifier = Modifier.weight(1f)) {
-//                Text(
-//                    text = transaction.category,
-//                    style = MaterialTheme.typography.titleMedium,
-//                    fontWeight = FontWeight.Bold
-//                )
-//                Text(
-//                    text = formattedDate,
-//                    style = MaterialTheme.typography.bodySmall
-//                )
-//            }
-//            Text(
-//                text = "$sign$${"%.2f".format(transaction.amount)}",
-//                style = MaterialTheme.typography.titleLarge,
-//                color = amountColor,
-//                fontWeight = FontWeight.Bold
-//            )
-//        }
-//    }
-//}
-
 @Preview(showBackground = true)
 @Composable
 fun ListPreview() {
-    val app = LocalContext.current.applicationContext as Application
-    val viewModel: FinanceViewModel = viewModel(
-        factory = FinanceViewModel.provideFactory(app)
-    )
-    FinanceTrackerTheme {
-        TransActionListScreenApp(viewModel)
+    FinanceTrackerTheme() {
+        val application = LocalContext.current.applicationContext as Application
+        val database = FinanceDatabase.getDatabase(application)
+        val repository = FinanceRepository(database.transactionDao(), database.categoryDao())
+        val previewViewModel = FinanceViewModel(repository)
+        TransActionListScreenApp(viewModel = previewViewModel)
     }
 }
-

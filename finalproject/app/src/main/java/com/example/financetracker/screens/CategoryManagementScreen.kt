@@ -75,12 +75,10 @@ fun CategoryManagementScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
 
 @Preview(showBackground = true)
 @Composable
-fun ManagementPreview() {
-    val app = LocalContext.current.applicationContext as Application
-    val viewModel: FinanceViewModel = viewModel(
-        factory = FinanceViewModel.provideFactory(app)
-    )
-    FinanceTrackerTheme {
-        CategoryManagementScreenApp(viewModel)
+fun CategoryPreview() {
+    FinanceTrackerTheme() {
+        CategoryManagementScreenApp()
     }
 }
+
+

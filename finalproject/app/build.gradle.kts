@@ -2,12 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt") // For Room annotation processing
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
     namespace = "com.example.financetracker"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.financetracker"
@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.benchmark.traceprocessor)
     implementation(libs.protolite.well.known.types)
+    implementation(libs.androidx.databinding.adapters)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     kapt(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

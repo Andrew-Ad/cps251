@@ -27,10 +27,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.viewmodel.FinanceViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
+import androidx.compose.ui.text.font.FontWeight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,13 +78,32 @@ fun HomeScreenApp(
                         .width(350.dp)
                         .height(100.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(12.dp),
-                    contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = "Current balance: $balance")
+                    Column {
+                        if (balance < 0) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = "Warning: Negative Balance",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Balance is positive",
+                                tint = Color(0xFF2BBD2B)
+                            )
+                        }
+
+                        Text(text = "Current Balance",
+                            style = MaterialTheme.typography.labelLarge)
+                        Text(text = "$$balance",    style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
             }
 
@@ -91,13 +116,16 @@ fun HomeScreenApp(
                         .width(165.dp)
                         .height(80.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = Color(0xE62BBD2B),
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(12.dp),
-                    contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = "Income")
+                    Column {
+                        Text(text = "Income", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "$$income", style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold))
+                    }
                 }
 
                 Box(
@@ -105,13 +133,16 @@ fun HomeScreenApp(
                         .width(165.dp)
                         .height(80.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = Color(0xE6F57369),
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(12.dp),
-                    contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Expense")
+                    Column {
+                        Text(text = "Expense", style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "$$expense", style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold))
+                    }
                 }
             }
 
@@ -119,7 +150,8 @@ fun HomeScreenApp(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp,)
             ) {
-                Text("Quick Actions")
+                Text("Quick Actions", style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold))
             }
 
             Row(
@@ -132,12 +164,14 @@ fun HomeScreenApp(
                         .width(165.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
                     Text(
                         text = "Transactions",
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
 
@@ -147,12 +181,14 @@ fun HomeScreenApp(
                         .width(165.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
                     Text(
                         text = "Categories",
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
@@ -161,8 +197,13 @@ fun HomeScreenApp(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp,)
             ) {
-                Text("Recent Transactions (Most Recent 5)")
-                Text("View All", modifier = Modifier.clickable(onClick = onNavigateToTransactions))
+                Text("Recent Transactions (Most Recent 5)",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold))
+                Text("View All",
+                    modifier = Modifier.clickable(onClick = onNavigateToTransactions),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

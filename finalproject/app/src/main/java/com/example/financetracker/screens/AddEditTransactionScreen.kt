@@ -75,18 +75,22 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Text("Edit Transaction")
-                        Spacer(Modifier.weight(1f))
-                        Text("Save")
-                    }
-                },
+                title = { Text("Edit Transaction") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = { onNavigateBack() }
+                    ) {
+                        Text(
+                            text = "Save",
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 },
@@ -96,6 +100,8 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
                 )
             )
         }
+//...
+
     ) { innerPadding ->
 
         if (showDatePicker) {
@@ -104,7 +110,6 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            // When the user confirms, update the selectedDate and hide the dialog
                             datePickerState.selectedDateMillis?.let {
                                 selectedDateMillis = it
                             }
@@ -154,8 +159,8 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
                         .height(35.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isExpenseSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (isExpenseSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        containerColor = if (isExpenseSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isExpenseSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text("Expense")
@@ -169,8 +174,8 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
                         .height(35.dp),
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isIncomeSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = if (isIncomeSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        containerColor = if (isIncomeSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = if (isIncomeSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text("Income")
@@ -246,6 +251,23 @@ fun AddEditTransactionScreenApp(viewModel: FinanceViewModel? = null, onNavigateB
                     text = dateFormatter.format(Date(selectedDateMillis)),
                     style = MaterialTheme.typography.bodyLarge
                 )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = { onNavigateBack() },
+                    modifier = Modifier.fillMaxWidth()
+                        .height(30.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "Save Transaction",
+                    )
+                }
             }
         }
     }

@@ -6,22 +6,48 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.financetracker.data.Category
 import com.example.financetracker.data.FinanceDatabase
+import com.example.financetracker.data.Transaction
 import com.example.financetracker.repository.FinanceRepository
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class FinanceViewModel(private val repository: FinanceRepository) : ViewModel() {
 
-    val allTransactions = repository.getAllTransactions()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val allTransactions: StateFlow<List<Transaction>> = repository.getAllTransactions()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
 
-    val allCategories = repository.getAllCategories()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val allCategories: StateFlow<List<Category>> = repository.getAllCategories()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList()
+        )
+
 
     fun insertCategory(category: Category) {
         viewModelScope.launch {
-            repository.insertCategory(category)
+            //repository.insertCategory(category)
+        }
+    }
+
+    fun addTransaction(type: String, amount: Double, category: String, description: String, date: Date) {
+        viewModelScope.launch {
+            val newTransaction = Transaction(
+                type = type,
+                amount = amount,
+                category = category,
+                description = description,
+                date = date,
+                categoryId = 0
+            )
+            //repository.insertTransaction(newTransaction)
         }
     }
 
@@ -31,9 +57,10 @@ class FinanceViewModel(private val repository: FinanceRepository) : ViewModel() 
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val database = FinanceDatabase.getDatabase(app)
                 val repo = FinanceRepository(
-                    FinanceDatabase.getDatabase(app).transactionDao(),
-                    FinanceDatabase.getDatabase(app).categoryDao()
+                    database.transactionDao(),
+                    database.categoryDao()
                 )
                 return FinanceViewModel(repo) as T
             }
